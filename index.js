@@ -6,8 +6,18 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3001;
-
-//Connect to database
+const { Server } = require("socket.io");
+const socketio = require("socket.io");
+const server = require("http").Server(app);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.FRONTEND_URL,
+    methods: ["GET", "POST"],
+    credentials: true,
+    allowedHeaders: ["Authorization"],
+  },
+});
+// Connect to database
 main().catch((err) => console.log(err));
 async function main() {
   await mongoose.connect(process.env.DB_URL);
@@ -22,6 +32,14 @@ app.use((req, res, next) => {
 });
 app.use("/", userRouter);
 
-app.listen(PORT, (res) => {
-  console.log("Server up and running");
+io.on("connection", (socket) => {
+  socket.on("sendMessage", (message) => {
+    io.emit("message", message);
+  });
+
+  socket.on("disconnect", () => {});
+});
+
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });

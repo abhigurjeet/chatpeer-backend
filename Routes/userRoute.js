@@ -8,4 +8,5 @@ router.post("/login", userhandler.getUser);
 router.get("/allusers", verifyToken, userhandler.getAllUsers);
 router.post("/createmessage", verifyToken, userhandler.createMessage);
 router.post("/getmessages", verifyToken, userhandler.getAllMessages);
+router.get("/getid", verifyToken);
 module.exports = router;
